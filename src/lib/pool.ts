@@ -17,18 +17,26 @@ export async function createPoolSnapshot(
 
   const routerAddress = pool.router as Hex;
 
-  const [totalSupplyAssets, totalBorrowAssets] = await Promise.all([
-    context.client.readContract({
-      abi: LendingPoolRouterAbi,
-      address: routerAddress,
-      functionName: "totalSupplyAssets",
-    }) as Promise<bigint>,
-    context.client.readContract({
-      abi: LendingPoolRouterAbi,
-      address: routerAddress,
-      functionName: "totalBorrowAssets",
-    }) as Promise<bigint>,
-  ]);
+  let totalSupplyAssets: bigint;
+  let totalBorrowAssets: bigint;
+
+  try {
+    [totalSupplyAssets, totalBorrowAssets] = await Promise.all([
+      context.client.readContract({
+        abi: LendingPoolRouterAbi,
+        address: routerAddress,
+        functionName: "totalSupplyAssets",
+      }) as Promise<bigint>,
+      context.client.readContract({
+        abi: LendingPoolRouterAbi,
+        address: routerAddress,
+        functionName: "totalBorrowAssets",
+      }) as Promise<bigint>,
+    ]);
+  } catch {
+    // Skip snapshot if RPC call fails (e.g. non-archive node can't read historical state)
+    return;
+  }
 
   const rateParams = await context.db.find(poolRateParams, {
     id: routerAddress,
