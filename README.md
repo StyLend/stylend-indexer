@@ -61,7 +61,7 @@ Arbitrum Sepolia
 
 ## Indexed Events
 
-### StyLendEmitter V2 (`0xf39ce77de228b30effb947fdab1ec2ac961212e7`)
+### StyLendEmitter (`0xf39ce77de228b30effb947fdab1ec2ac961212e7`)
 
 | Event | Description |
 |-------|-------------|
@@ -195,7 +195,7 @@ stylend-indexer/
 │   │   ├── factory.ts            # 22 LendingPoolFactory event handlers
 │   │   ├── lendingPool.ts        # LendingPool ownership handler
 │   │   ├── irm.ts                # 8 InterestRateModel handlers
-│   │   └── emitter.ts            # 13 EmitterV2 event handlers
+│   │   └── emitter.ts            # 13 Emitter event handlers
 │   ├── lib/
 │   │   ├── constants.ts          # WAD, default reserve factor, IDs
 │   │   ├── calculations.ts       # Borrow rate & supply APR formulas
@@ -334,7 +334,7 @@ query {
 | Contract | Address |
 |----------|---------|
 | **LendingPoolFactory** | [`0x6ce797460987931a88d061d0cb2729af36e6e754`](https://sepolia.arbiscan.io/address/0x6ce797460987931a88d061d0cb2729af36e6e754) |
-| **StyLendEmitter V2** | [`0xf39ce77de228b30effb947fdab1ec2ac961212e7`](https://sepolia.arbiscan.io/address/0xf39ce77de228b30effb947fdab1ec2ac961212e7) |
+| **StyLendEmitter** | [`0xf39ce77de228b30effb947fdab1ec2ac961212e7`](https://sepolia.arbiscan.io/address/0xf39ce77de228b30effb947fdab1ec2ac961212e7) |
 | **InterestRateModel** | [`0x1c1c290df8fe859778fe21eeada7a30c6d91587f`](https://sepolia.arbiscan.io/address/0x1c1c290df8fe859778fe21eeada7a30c6d91587f) |
 
 See the [smart contract repo](https://github.com/StyLend/stylend-sc) for full contract details and ABIs.
