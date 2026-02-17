@@ -1,0 +1,176 @@
+[
+  {
+    "type": "function",
+    "name": "initialize",
+    "inputs": [
+      {
+        "name": "factory",
+        "type": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "factory",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setFactory",
+    "inputs": [
+      {
+        "name": "newFactory",
+        "type": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "exactInputSingle",
+    "inputs": [
+      {
+        "name": "params",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "tokenIn",
+            "type": "address"
+          },
+          {
+            "name": "tokenOut",
+            "type": "address"
+          },
+          {
+            "name": "fee",
+            "type": "uint24"
+          },
+          {
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "name": "deadline",
+            "type": "uint256"
+          },
+          {
+            "name": "amountIn",
+            "type": "uint256"
+          },
+          {
+            "name": "amountOutMinimum",
+            "type": "uint256"
+          },
+          {
+            "name": "sqrtPriceLimitX96",
+            "type": "uint160"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "tokenCalculator",
+    "inputs": [
+      {
+        "name": "tokenIn",
+        "type": "address"
+      },
+      {
+        "name": "tokenOut",
+        "type": "address"
+      },
+      {
+        "name": "amountIn",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "transferOwnership",
+    "inputs": [
+      {
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "renounceOwnership",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "ExactInputSingle",
+    "inputs": [
+      {
+        "name": "tokenIn",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "tokenOut",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "amountIn",
+        "type": "uint256",
+        "indexed": false
+      },
+      {
+        "name": "amountOut",
+        "type": "uint256",
+        "indexed": false
+      },
+      {
+        "name": "amountOutMinimum",
+        "type": "uint256",
+        "indexed": false
+      }
+    ]
+  }
+]

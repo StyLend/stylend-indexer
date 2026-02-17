@@ -1,0 +1,207 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "receiveEth",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "lendingPoolFactory",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "protocolFees",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getProtocolFee",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setLendingPoolFactory",
+    "inputs": [
+      {
+        "name": "factory",
+        "type": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setProtocolFee",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "name": "fee",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "withdraw",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "transferOwnership",
+    "inputs": [
+      {
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "renounceOwnership",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "error",
+    "name": "InsufficientBalance",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "LendingPoolFactoryNotSet",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "Reentrancy",
+    "inputs": []
+  },
+  {
+    "type": "event",
+    "name": "Withdraw",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "indexed": false
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "ProtocolFeeSet",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "indexed": false
+      },
+      {
+        "name": "fee",
+        "type": "uint256",
+        "indexed": false
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "LendingPoolFactorySet",
+    "inputs": [
+      {
+        "name": "lendingPoolFactory",
+        "type": "address",
+        "indexed": false
+      }
+    ]
+  }
+]
