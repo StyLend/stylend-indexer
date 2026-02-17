@@ -6,6 +6,12 @@
 
 <p align="center"><b>Real-time on-chain indexer for the StyLend lending protocol on Arbitrum Stylus</b></p>
 
+<p align="center">
+  <a href="https://www.stylend.xyz/">Website</a> ·
+  <a href="https://app.stylend.xyz">Launch App</a> · 
+  <a href="https://api.stylend.xyz/">API</a>
+</p>
+
 StyLend Indexer tracks all lending pool activity (supply, borrow, repay, withdraw, collateral) and computes real-time metrics like APY, utilization, and interest rates. Built with [Ponder](https://ponder.sh) for event-driven indexing with a GraphQL API.
 
 ## Features

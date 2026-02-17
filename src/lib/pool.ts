@@ -10,10 +10,14 @@ export async function createPoolSnapshot(
   blockNumber: bigint,
   logIndex: number,
   timestamp: bigint,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   context: any,
 ) {
   const pool = await context.db.find(lendingPool, { id: lpAddress });
-  if (!pool) return;
+  if (!pool) {
+    console.warn(`[snapshot] Pool ${lpAddress} not found, skipping`);
+    return;
+  }
 
   const routerAddress = pool.router as Hex;
 
@@ -33,8 +37,10 @@ export async function createPoolSnapshot(
         functionName: "totalBorrowAssets",
       }) as Promise<bigint>,
     ]);
-  } catch {
-    // Skip snapshot if RPC call fails (e.g. non-archive node can't read historical state)
+  } catch (error) {
+    console.warn(
+      `[snapshot] RPC read failed for pool ${lpAddress} at block ${blockNumber}: ${error instanceof Error ? error.message : "unknown error"}`,
+    );
     return;
   }
 
@@ -74,17 +80,20 @@ export async function createPoolSnapshot(
   });
 }
 
+type BalanceField =
+  | "totalSupplied"
+  | "totalWithdrawn"
+  | "totalBorrowed"
+  | "totalRepaid"
+  | "totalCollateralSupplied"
+  | "totalCollateralWithdrawn";
+
 export async function upsertUserPoolBalance(
   user: Hex,
   lpAddress: Hex,
-  field:
-    | "totalSupplied"
-    | "totalWithdrawn"
-    | "totalBorrowed"
-    | "totalRepaid"
-    | "totalCollateralSupplied"
-    | "totalCollateralWithdrawn",
+  field: BalanceField,
   amount: bigint,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   context: any,
 ) {
   const id = `${user}_${lpAddress}`;
@@ -95,17 +104,20 @@ export async function upsertUserPoolBalance(
       .update(userPoolBalance, { id })
       .set({ [field]: (existing[field] as bigint) + amount });
   } else {
-    await context.db.insert(userPoolBalance).values({
-      id,
-      user,
-      lendingPool: lpAddress,
-      totalSupplied: 0n,
-      totalWithdrawn: 0n,
-      totalBorrowed: 0n,
-      totalRepaid: 0n,
-      totalCollateralSupplied: 0n,
-      totalCollateralWithdrawn: 0n,
-      [field]: amount,
-    });
+    await context.db
+      .insert(userPoolBalance)
+      .values({
+        id,
+        user,
+        lendingPool: lpAddress,
+        totalSupplied: 0n,
+        totalWithdrawn: 0n,
+        totalBorrowed: 0n,
+        totalRepaid: 0n,
+        totalCollateralSupplied: 0n,
+        totalCollateralWithdrawn: 0n,
+        [field]: amount,
+      })
+      .onConflictDoUpdate({ [field]: amount });
   }
 }

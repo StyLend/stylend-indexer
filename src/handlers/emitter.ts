@@ -13,30 +13,45 @@ import {
 } from "ponder:schema";
 import { createPoolSnapshot, upsertUserPoolBalance } from "../lib/pool";
 
+function getLpAddress(txTo: Hex | null): Hex | null {
+  if (!txTo) {
+    console.warn("[emitter] event.transaction.to is null, skipping");
+    return null;
+  }
+  return txTo;
+}
+
 ponder.on("EmitterV2:OwnershipTransferred", async (_args) => {
   // Emitter ownership tracked separately if needed
 });
 
 ponder.on("EmitterV2:PositionCreated", async ({ event, context }) => {
-  await context.db.insert(position).values({
-    id: event.args.position,
-    lendingPool: event.args.lendingPool,
-    lendingPoolRouter: event.args.lendingPoolRouter,
-    user: event.args.user,
-    createdAtBlock: BigInt(event.block.number),
-    createdAtTimestamp: event.block.timestamp,
-  });
+  await context.db
+    .insert(position)
+    .values({
+      id: event.args.position,
+      lendingPool: event.args.lendingPool,
+      lendingPoolRouter: event.args.lendingPoolRouter,
+      user: event.args.user,
+      createdAtBlock: BigInt(event.block.number),
+      createdAtTimestamp: event.block.timestamp,
+    })
+    .onConflictDoNothing();
 });
 
 ponder.on("EmitterV2:SharesTokenDeployed", async ({ event, context }) => {
-  await context.db.insert(sharesTokenDeployment).values({
-    id: event.args.sharesToken,
-    lendingPoolRouter: event.args.lendingPoolRouter,
-  });
+  await context.db
+    .insert(sharesTokenDeployment)
+    .values({
+      id: event.args.sharesToken,
+      lendingPoolRouter: event.args.lendingPoolRouter,
+    })
+    .onConflictDoNothing();
 });
 
 ponder.on("EmitterV2:SupplyLiquidity", async ({ event, context }) => {
-  const lpAddress = event.transaction.to as Hex;
+  const lpAddress = getLpAddress(event.transaction.to);
+  if (!lpAddress) return;
 
   await context.db.insert(supplyLiquidityEvent).values({
     id: `${event.block.number}_${event.log.logIndex}`,
@@ -60,7 +75,8 @@ ponder.on("EmitterV2:SupplyLiquidity", async ({ event, context }) => {
 });
 
 ponder.on("EmitterV2:WithdrawLiquidity", async ({ event, context }) => {
-  const lpAddress = event.transaction.to as Hex;
+  const lpAddress = getLpAddress(event.transaction.to);
+  if (!lpAddress) return;
 
   await context.db.insert(withdrawLiquidityEvent).values({
     id: `${event.block.number}_${event.log.logIndex}`,
@@ -84,7 +100,8 @@ ponder.on("EmitterV2:WithdrawLiquidity", async ({ event, context }) => {
 });
 
 ponder.on("EmitterV2:SupplyCollateral", async ({ event, context }) => {
-  const lpAddress = event.transaction.to as Hex;
+  const lpAddress = getLpAddress(event.transaction.to);
+  if (!lpAddress) return;
 
   await context.db.insert(supplyCollateralEvent).values({
     id: `${event.block.number}_${event.log.logIndex}`,
@@ -103,7 +120,8 @@ ponder.on("EmitterV2:SupplyCollateral", async ({ event, context }) => {
 });
 
 ponder.on("EmitterV2:BorrowDebt", async ({ event, context }) => {
-  const lpAddress = event.transaction.to as Hex;
+  const lpAddress = getLpAddress(event.transaction.to);
+  if (!lpAddress) return;
 
   await context.db.insert(borrowDebtEvent).values({
     id: `${event.block.number}_${event.log.logIndex}`,
@@ -129,7 +147,8 @@ ponder.on("EmitterV2:BorrowDebt", async ({ event, context }) => {
 });
 
 ponder.on("EmitterV2:RepayByPosition", async ({ event, context }) => {
-  const lpAddress = event.transaction.to as Hex;
+  const lpAddress = getLpAddress(event.transaction.to);
+  if (!lpAddress) return;
 
   await context.db.insert(repayByPositionEvent).values({
     id: `${event.block.number}_${event.log.logIndex}`,
@@ -153,7 +172,8 @@ ponder.on("EmitterV2:RepayByPosition", async ({ event, context }) => {
 });
 
 ponder.on("EmitterV2:WithdrawCollateral", async ({ event, context }) => {
-  const lpAddress = event.transaction.to as Hex;
+  const lpAddress = getLpAddress(event.transaction.to);
+  if (!lpAddress) return;
 
   await context.db.insert(withdrawCollateralEvent).values({
     id: `${event.block.number}_${event.log.logIndex}`,
