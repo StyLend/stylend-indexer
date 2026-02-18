@@ -1,6 +1,10 @@
 import { createConfig, factory } from "ponder";
 import { parseAbiItem } from "viem";
-import { FACTORY, EMITTER_V2, INTEREST_RATE_MODEL } from "./src/constant/addresses";
+import {
+  FACTORY,
+  EMITTER_V2,
+  INTEREST_RATE_MODEL,
+} from "./src/constant/addresses";
 import { LendingPoolFactoryAbi } from "./src/abis/LendingPoolFactoryAbi";
 import { LendingPoolAbi } from "./src/abis/LendingPoolAbi";
 import { StyLendEmitterAbi } from "./src/abis/StyLendEmitterAbi";
@@ -18,7 +22,7 @@ export default createConfig({
       chain: "arbitrumSepolia",
       abi: LendingPoolFactoryAbi,
       address: FACTORY,
-      startBlock: 243284436,
+      startBlock: 243554451,
     },
     LendingPool: {
       chain: "arbitrumSepolia",
@@ -30,19 +34,19 @@ export default createConfig({
         ),
         parameter: "lendingPool",
       }),
-      startBlock: 243284436,
+      startBlock: 243554451,
     },
     EmitterV2: {
       chain: "arbitrumSepolia",
       abi: StyLendEmitterAbi,
       address: EMITTER_V2,
-      startBlock: 243284436,
+      startBlock: 243554451,
     },
     InterestRateModel: {
       chain: "arbitrumSepolia",
       abi: InterestRateModelAbi,
       address: INTEREST_RATE_MODEL,
-      startBlock: 243284436,
+      startBlock: 243554451,
     },
   },
 });

@@ -50,7 +50,7 @@ Arbitrum Sepolia
                     ┌────────────┴───────────┐
                     │      PostgreSQL         │
                     │                        │
-                    │  • 20 tables           │
+                    │  • 21 tables           │
                     │  • Snapshots           │
                     │  • User balances       │
                     └────────────┬───────────┘
@@ -194,14 +194,14 @@ The indexer reads on-chain state via `readContract` after each lending event to 
 ```
 stylend-indexer/
 ├── ponder.config.ts              # Chain, contract, & block config
-├── ponder.schema.ts              # Database schema (20 tables)
+├── ponder.schema.ts              # Database schema (21 tables)
 ├── src/
 │   ├── index.ts                  # Barrel imports for all handlers
 │   ├── handlers/
 │   │   ├── factory.ts            # 22 LendingPoolFactory event handlers
 │   │   ├── lendingPool.ts        # LendingPool ownership handler
-│   │   ├── irm.ts                # 8 InterestRateModel handlers
-│   │   └── emitter.ts            # 13 Emitter event handlers
+│   │   ├── irm.ts                # 9 InterestRateModel handlers
+│   │   └── emitter.ts            # 11 Emitter event handlers
 │   ├── lib/
 │   │   ├── constants.ts          # WAD, default reserve factor, IDs
 │   │   ├── calculations.ts       # Borrow rate & supply APR formulas
@@ -240,7 +240,7 @@ stylend-indexer/
 pnpm install
 
 # Create environment config
-cp .env.local.example .env.local
+cp .env.local.example .env.local  # or create manually
 # Edit .env.local with your RPC URL and database config
 
 # Run the indexer (development)

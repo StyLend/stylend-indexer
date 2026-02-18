@@ -57,30 +57,23 @@
     "name": "withdrawCollateral",
     "inputs": [
       { "name": "amount", "type": "uint256" },
-      { "name": "user", "type": "address" }
+      { "name": "user", "type": "address" },
+      { "name": "collateral_token", "type": "address" },
+      { "name": "wrapped_native", "type": "address" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "swapTokenByPosition",
+    "name": "pullTokenForSwap",
     "inputs": [
-      {
-        "name": "params",
-        "type": "tuple",
-        "components": [
-          { "name": "tokenIn", "type": "address" },
-          { "name": "tokenOut", "type": "address" },
-          { "name": "amountIn", "type": "uint256" },
-          { "name": "amountOutMinimum", "type": "uint256" },
-          { "name": "fee", "type": "uint24" }
-        ]
-      }
+      { "name": "token_in", "type": "address" },
+      { "name": "token_out", "type": "address" },
+      { "name": "amount_in", "type": "uint256" },
+      { "name": "wrapped_native", "type": "address" }
     ],
-    "outputs": [
-      { "name": "", "type": "uint256" }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
@@ -97,7 +90,11 @@
           { "name": "amountOutMinimum", "type": "uint256" },
           { "name": "fee", "type": "uint24" }
         ]
-      }
+      },
+      { "name": "wrapped_native", "type": "address" },
+      { "name": "dex_router", "type": "address" },
+      { "name": "borrow_token", "type": "address" },
+      { "name": "factory_addr", "type": "address" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -116,7 +113,11 @@
           { "name": "amountOutMinimum", "type": "uint256" },
           { "name": "fee", "type": "uint24" }
         ]
-      }
+      },
+      { "name": "wrapped_native", "type": "address" },
+      { "name": "dex_router", "type": "address" },
+      { "name": "borrow_token", "type": "address" },
+      { "name": "factory_addr", "type": "address" }
     ],
     "outputs": [],
     "stateMutability": "payable"
@@ -126,7 +127,9 @@
     "name": "liquidation",
     "inputs": [
       { "name": "liquidator", "type": "address" },
-      { "name": "liquidation_bonus", "type": "uint256" }
+      { "name": "liquidation_bonus", "type": "uint256" },
+      { "name": "protocol_addr", "type": "address" },
+      { "name": "wrapped_native", "type": "address" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
