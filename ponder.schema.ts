@@ -70,6 +70,10 @@ export const lendingPool = onchainTable(
     routerImplementation: t.hex().notNull(),
     lendingPoolImplementation: t.hex().notNull(),
     sharesToken: t.hex().notNull(),
+    totalCollateral: t.bigint().notNull(),
+    lastSnapshotSupply: t.bigint().notNull(),
+    lastSnapshotBorrow: t.bigint().notNull(),
+    lastSnapshotCollateral: t.bigint().notNull(),
     createdAtBlock: t.bigint().notNull(),
     createdAtTimestamp: t.bigint().notNull(),
   }),
@@ -250,6 +254,7 @@ export const poolSnapshot = onchainTable(
     router: t.hex().notNull(),
     totalSupplyAssets: t.bigint().notNull(),
     totalBorrowAssets: t.bigint().notNull(),
+    totalCollateral: t.bigint().notNull(),
     availableLiquidity: t.bigint().notNull(),
     utilization: t.bigint().notNull(),
     borrowRate: t.bigint().notNull(),
@@ -263,6 +268,16 @@ export const poolSnapshot = onchainTable(
     timestampIdx: index().on(table.timestamp),
   }),
 );
+
+// ── Protocol TVL singleton ──────────────────────────────────────────────────
+export const protocolTvl = onchainTable("protocol_tvl", (t) => ({
+  id: t.text().primaryKey(),
+  totalSupplyAssets: t.bigint().notNull(),
+  totalBorrowAssets: t.bigint().notNull(),
+  totalCollateral: t.bigint().notNull(),
+  poolCount: t.integer().notNull(),
+  lastUpdatedAt: t.bigint().notNull(),
+}));
 
 // ── User pool balances (running totals per user per pool) ──────────────────
 export const userPoolBalance = onchainTable(

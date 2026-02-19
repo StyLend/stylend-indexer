@@ -16,9 +16,10 @@ StyLend Indexer tracks all lending pool activity (supply, borrow, repay, withdra
 
 ## Features
 
-- **Real-time pool metrics** — Utilization rate, available liquidity per pool
+- **Real-time pool metrics** — Utilization rate, available liquidity, collateral per pool
+- **Protocol TVL** — Aggregated supply, borrow, and collateral totals across all pools
 - **APY calculations** — Supply APY, borrow APR computed from the two-slope interest rate model
-- **Historical snapshots** — Time-series pool snapshots on every supply/borrow/repay/withdraw event
+- **Historical snapshots** — Time-series pool snapshots on every supply/borrow/repay/withdraw/collateral event
 - **Per-user tracking** — Running totals of supply, borrow, collateral per user per pool
 - **Multi-pool support** — Automatically discovers new pools from Factory events
 - **IRM parameter tracking** — Real-time interest rate model configuration changes
@@ -50,7 +51,7 @@ Arbitrum Sepolia
                     ┌────────────┴───────────┐
                     │      PostgreSQL         │
                     │                        │
-                    │  • 21 tables           │
+                    │  • 22 tables           │
                     │  • Snapshots           │
                     │  • User balances       │
                     └────────────┬───────────┘
@@ -75,8 +76,8 @@ Arbitrum Sepolia
 | `WithdrawLiquidity(user, amount, shares)` | User withdraws from pool |
 | `BorrowDebt(user, protocolFee, userAmount, shares, amount)` | User borrows from pool |
 | `RepayByPosition(user, amount, shares)` | User repays debt |
-| `SupplyCollateral(positionAddress, user, amount)` | User deposits collateral |
-| `WithdrawCollateral(user, amount)` | User withdraws collateral |
+| `SupplyCollateral(positionAddress, user, amount)` | User deposits collateral + snapshot |
+| `WithdrawCollateral(user, amount)` | User withdraws collateral + snapshot |
 | `PositionCreated(lendingPool, router, user, position)` | New borrower position |
 | `SharesTokenDeployed(router, sharesToken)` | Pool shares token created |
 | `AdminGranted / AdminRevoked(account)` | Emitter admin management |
@@ -136,14 +137,16 @@ lending_pool
 ├── ltv / liquidationThreshold / liquidationBonus
 ├── router / routerImplementation / lendingPoolImplementation
 ├── sharesToken
+├── totalCollateral          # Running total of collateral in pool
+├── lastSnapshotSupply / lastSnapshotBorrow / lastSnapshotCollateral
 ├── baseRate / rateAtOptimal / optimalUtilization / maxUtilization / maxRate
 ├── supplyLiquidity
 └── createdAtBlock / createdAtTimestamp
 
-pool_snapshot                    # Time-series (created on each supply/borrow/repay/withdraw)
+pool_snapshot                    # Time-series (created on each supply/borrow/repay/withdraw/collateral)
 ├── id                           # ${lp}_${block}_${logIndex}
 ├── lendingPool / router
-├── totalSupplyAssets / totalBorrowAssets / availableLiquidity
+├── totalSupplyAssets / totalBorrowAssets / totalCollateral / availableLiquidity
 ├── utilization / borrowRate / supplyAPR
 ├── eventType
 └── blockNumber / timestamp
@@ -159,6 +162,12 @@ pool_rate_params                 # IRM parameters per pool router
 ├── id                           # LendingPoolRouter address
 ├── baseRate / rateAtOptimal / optimalUtilization
 ├── maxUtilization / maxRate / reserveFactor
+
+protocol_tvl                     # Singleton — aggregated TVL across all pools
+├── id                           # "protocol"
+├── totalSupplyAssets / totalBorrowAssets / totalCollateral
+├── poolCount
+└── lastUpdatedAt
 
 position                         # Borrower positions
 ├── id                           # Position contract address
@@ -194,7 +203,7 @@ The indexer reads on-chain state via `readContract` after each lending event to 
 ```
 stylend-indexer/
 ├── ponder.config.ts              # Chain, contract, & block config
-├── ponder.schema.ts              # Database schema (21 tables)
+├── ponder.schema.ts              # Database schema (22 tables)
 ├── src/
 │   ├── index.ts                  # Barrel imports for all handlers
 │   ├── handlers/
@@ -317,6 +326,17 @@ query {
       totalCollateralSupplied
       totalCollateralWithdrawn
     }
+  }
+}
+
+# Get protocol-wide TVL
+query {
+  protocolTvl(id: "protocol") {
+    totalSupplyAssets
+    totalBorrowAssets
+    totalCollateral
+    poolCount
+    lastUpdatedAt
   }
 }
 

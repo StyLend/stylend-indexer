@@ -8,8 +8,9 @@ import {
   factoryChainEid,
   lendingPool,
   poolRateParams,
+  protocolTvl,
 } from "ponder:schema";
-import { FACTORY_ID, DEFAULT_RESERVE_FACTOR } from "../lib/constants";
+import { FACTORY_ID, DEFAULT_RESERVE_FACTOR, PROTOCOL_TVL_ID } from "../lib/constants";
 
 ponder.on("LendingPoolFactory:setup", async ({ context }) => {
   await context.db.insert(factoryConfig).values({
@@ -44,9 +45,30 @@ ponder.on("LendingPoolFactory:LendingPoolCreated", async ({ event, context }) =>
     routerImplementation: event.args.routerImplementation,
     lendingPoolImplementation: event.args.lendingPoolImplementation,
     sharesToken: event.args.sharesToken,
+    totalCollateral: 0n,
+    lastSnapshotSupply: 0n,
+    lastSnapshotBorrow: 0n,
+    lastSnapshotCollateral: 0n,
     createdAtBlock: BigInt(event.block.number),
     createdAtTimestamp: event.block.timestamp,
   });
+
+  // Increment protocol pool count
+  const existing = await context.db.find(protocolTvl, { id: PROTOCOL_TVL_ID });
+  if (existing) {
+    await context.db
+      .update(protocolTvl, { id: PROTOCOL_TVL_ID })
+      .set({ poolCount: existing.poolCount + 1 });
+  } else {
+    await context.db.insert(protocolTvl).values({
+      id: PROTOCOL_TVL_ID,
+      totalSupplyAssets: 0n,
+      totalBorrowAssets: 0n,
+      totalCollateral: 0n,
+      poolCount: 1,
+      lastUpdatedAt: event.block.timestamp,
+    });
+  }
 
   await context.db
     .insert(poolRateParams)

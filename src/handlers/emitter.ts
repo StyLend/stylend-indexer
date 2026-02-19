@@ -10,6 +10,7 @@ import {
   repayByPositionEvent,
   withdrawCollateralEvent,
   emitterAdmin,
+  lendingPool,
 } from "ponder:schema";
 import { createPoolSnapshot, upsertUserPoolBalance } from "../lib/pool";
 
@@ -117,6 +118,19 @@ ponder.on("EmitterV2:SupplyCollateral", async ({ event, context }) => {
   await upsertUserPoolBalance(
     event.args.user, lpAddress, "totalCollateralSupplied", event.args.amount, context,
   );
+
+  // Update pool totalCollateral
+  const pool = await context.db.find(lendingPool, { id: lpAddress });
+  if (pool) {
+    await context.db
+      .update(lendingPool, { id: lpAddress })
+      .set({ totalCollateral: pool.totalCollateral + event.args.amount });
+  }
+
+  await createPoolSnapshot(
+    lpAddress, "SupplyCollateral", BigInt(event.block.number),
+    event.log.logIndex, event.block.timestamp, context,
+  );
 });
 
 ponder.on("EmitterV2:BorrowDebt", async ({ event, context }) => {
@@ -187,6 +201,19 @@ ponder.on("EmitterV2:WithdrawCollateral", async ({ event, context }) => {
 
   await upsertUserPoolBalance(
     event.args.user, lpAddress, "totalCollateralWithdrawn", event.args.amount, context,
+  );
+
+  // Update pool totalCollateral
+  const pool = await context.db.find(lendingPool, { id: lpAddress });
+  if (pool) {
+    await context.db
+      .update(lendingPool, { id: lpAddress })
+      .set({ totalCollateral: pool.totalCollateral - event.args.amount });
+  }
+
+  await createPoolSnapshot(
+    lpAddress, "WithdrawCollateral", BigInt(event.block.number),
+    event.log.logIndex, event.block.timestamp, context,
   );
 });
 

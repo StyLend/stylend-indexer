@@ -1,7 +1,7 @@
 import type { Hex } from "viem";
-import { lendingPool, poolRateParams, poolSnapshot, userPoolBalance } from "ponder:schema";
+import { lendingPool, poolRateParams, poolSnapshot, protocolTvl, userPoolBalance } from "ponder:schema";
 import { LendingPoolRouterAbi } from "../abis/LendingPoolRouterAbi";
-import { WAD, DEFAULT_RESERVE_FACTOR } from "./constants";
+import { WAD, DEFAULT_RESERVE_FACTOR, PROTOCOL_TVL_ID } from "./constants";
 import { calculateBorrowRate, calculateSupplyAPR } from "./calculations";
 
 export async function createPoolSnapshot(
@@ -64,12 +64,15 @@ export async function createPoolSnapshot(
       ? calculateSupplyAPR(borrowRate, utilization, reserveFactor)
       : 0n;
 
+  const totalCollateral = BigInt(pool.totalCollateral ?? 0);
+
   await context.db.insert(poolSnapshot).values({
     id: `${lpAddress}_${blockNumber}_${logIndex}`,
     lendingPool: lpAddress,
     router: routerAddress,
     totalSupplyAssets,
     totalBorrowAssets,
+    totalCollateral,
     availableLiquidity: totalSupplyAssets - totalBorrowAssets,
     utilization,
     borrowRate,
@@ -78,6 +81,60 @@ export async function createPoolSnapshot(
     blockNumber,
     timestamp,
   });
+
+  // Compute deltas from the pool's last-known snapshot values
+  const oldSupply = BigInt(pool.lastSnapshotSupply ?? 0);
+  const oldBorrow = BigInt(pool.lastSnapshotBorrow ?? 0);
+  const oldCollateral = BigInt(pool.lastSnapshotCollateral ?? 0);
+
+  await updateProtocolTvl(
+    totalSupplyAssets - oldSupply,
+    totalBorrowAssets - oldBorrow,
+    totalCollateral - oldCollateral,
+    timestamp,
+    context,
+  );
+
+  // Update the pool with latest snapshot values for future delta computation
+  await context.db
+    .update(lendingPool, { id: lpAddress })
+    .set({
+      lastSnapshotSupply: totalSupplyAssets,
+      lastSnapshotBorrow: totalBorrowAssets,
+      lastSnapshotCollateral: totalCollateral,
+    });
+}
+
+async function updateProtocolTvl(
+  supplyDelta: bigint,
+  borrowDelta: bigint,
+  collateralDelta: bigint,
+  timestamp: bigint,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  context: any,
+) {
+  const existing = await context.db.find(protocolTvl, { id: PROTOCOL_TVL_ID });
+
+  if (existing) {
+    await context.db
+      .update(protocolTvl, { id: PROTOCOL_TVL_ID })
+      .set({
+        totalSupplyAssets: existing.totalSupplyAssets + supplyDelta,
+        totalBorrowAssets: existing.totalBorrowAssets + borrowDelta,
+        totalCollateral: existing.totalCollateral + collateralDelta,
+        lastUpdatedAt: timestamp,
+      });
+  } else {
+    // First snapshot ever — deltas ARE the absolute values
+    await context.db.insert(protocolTvl).values({
+      id: PROTOCOL_TVL_ID,
+      totalSupplyAssets: supplyDelta > 0n ? supplyDelta : 0n,
+      totalBorrowAssets: borrowDelta > 0n ? borrowDelta : 0n,
+      totalCollateral: collateralDelta > 0n ? collateralDelta : 0n,
+      poolCount: 1,
+      lastUpdatedAt: timestamp,
+    });
+  }
 }
 
 type BalanceField =
